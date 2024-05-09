@@ -1,4 +1,3 @@
-# tasks.py
 from celery import current_task, shared_task, Celery
 import redis
 import requests
