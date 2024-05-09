@@ -1,0 +1,60 @@
+version: '3.3'
+
+services:
+  django:
+    container_name: django
+    build:
+      context: ./djcelery
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./djcelery:/usr/src/app/
+    ports:
+      - "8001:8000"
+    environment:
+      - DEBUG=1
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - celery-worker
+      - celery-beat
+    networks:
+      - mynetwork
+
+  redis:
+    container_name: redis
+    image: redis:7.0.11-alpine
+    networks:
+      - mynetwork
+
+  celery-worker:
+    container_name: celery-worker
+    build:
+      context: ./djcelery
+    command: celery -A djcelery worker -l info
+    volumes:
+      - ./djcelery:/usr/src/app
+    environment:
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    networks:
+      - mynetwork
+
+  celery-beat:
+    container_name: celery-beat
+    build:
+      context: ./djcelery
+    command: celery -A djcelery beat -l info
+    volumes:
+      - ./djcelery:/usr/src/app
+    environment:
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:

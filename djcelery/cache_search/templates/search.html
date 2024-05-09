@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News Articles</title>
+</head>
+<body>
+
+    <form action="" method="get">
+        <label for="search">Search:</label>
+        <input type="text" name="q" id="search" placeholder="Enter search term">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if search_q %}
+        <h1>Search Results for "{{ search_q }}"</h1>
+    {% endif %}
+    
+    <h1>Latest News Articles</h1>
+    {% for article in articles %}
+        <h2>{{ article.title }}</h2>
+        <p>{{ article.description }}</p>
+        <a href="{{ article.url }}" target="_blank">Read more</a>
+        <hr>
+    {% endfor %}
+</body>
+</html>
